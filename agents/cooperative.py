@@ -16,7 +16,7 @@ class CooperativeAgent:
         self.grid = grid
         self.base_x, self.base_y = base_x, base_y
         self.obstacles = obstacles
-        self.color = constantes.STRUCTURE_COLOR
+        self.color = constantes.COOPERATIVE_COLOR
         self.resources_collected = 0
         self.shared_info = {}
         self.plan = []
@@ -105,10 +105,15 @@ class CooperativeAgent:
             self.y += 1 if dy > 0 else -1 if dy < 0 else 0
             yield self.env.timeout(1)
 
-    def draw(self, screen):
+    def draw(self, screen): 
         """
         Desenha o agente como um círculo na tela do pygame.
         """
         size = constantes.CELL_SIZE
-        center = (self.x * size + size // 2, self.y * size + size // 2)
-        pygame.draw.circle(screen, self.color, center, size // 2 - 2)
+        rect = pygame.Rect(
+            self.x * size + 2,
+            self.y * size + 2,
+            size - 4,
+            size - 4
+        )
+        pygame.draw.rect(screen, self.color, rect)

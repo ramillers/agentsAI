@@ -12,7 +12,7 @@ class ReactiveAgent:
         self.grid = grid                # lista de Resource
         self.base_x, self.base_y = base_x, base_y
         self.obstacles = obstacles
-        self.color = constantes.CRYSTAL_COLOR
+        self.color = constantes.REACTIVE_COLOR
         self.resources_collected = 0
         self.shared_info = {}           # painel local
         self.in_storm = False
@@ -64,10 +64,15 @@ class ReactiveAgent:
                 yield self.env.timeout(1)
 
     def draw(self, screen):
+        """
+        Desenha o agente como um círculo usando sua cor e posição.
+        """
         import pygame
         size = constantes.cell_size
-        pygame.draw.circle(
-            screen, self.color,
-            (self.x*size+size//2, self.y*size+size//2),
-            size//2 - 2
+        rect = pygame.Rect(
+            self.x * size + 2,
+            self.y * size + 2,
+            size - 4,
+            size - 4
         )
+        pygame.draw.rect(screen, self.color, rect)

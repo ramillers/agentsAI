@@ -18,6 +18,12 @@ METAL_COLOR = (255, 215, 0)       # metal (dourado)
 STRUCTURE_COLOR = (255, 0, 255)   # estrutura (magenta)
 OBSTACLE_COLOR = (100, 100, 100)  # obstáculos
 
+BDI_COLOR = (249, 28, 94)
+COOPERATIVE_COLOR = (51, 30, 247)
+GOALBASED_COLOR = (85, 249, 244)
+REACTIVE_COLOR = (133, 252, 82)
+STATEBASED_COLOR = (254, 51, 29)
+
 # Quantidade de recursos
 NUM_CRYSTALS = 10
 NUM_METAL = 10

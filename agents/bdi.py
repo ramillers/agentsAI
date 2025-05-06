@@ -12,7 +12,7 @@ class BDIAgent:
         self.grid = grid
         self.base_x, self.base_y = base_x, base_y
         self.obstacles = obstacles
-        self.color = constantes.BASE_COLOR
+        self.color = constantes.BDI_COLOR
         self.beliefs = {}
         self.desires = []
         self.intentions = None

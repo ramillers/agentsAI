@@ -36,6 +36,17 @@ def storm_controller(env, agents):
             ag.in_storm = False
         env.is_storm = False
 
+def draw_lightning(screen):
+    if random.random() < 0.1:  # 10% de chance de desenhar um raio por frame
+        start_x = random.randint(0, constantes.GRID_WIDTH * constantes.CELL_SIZE)
+        points = []
+        y = 0
+        while y < constantes.GRID_HEIGHT * constantes.CELL_SIZE:
+            points.append((start_x, y))
+            start_x += random.randint(-20, 20)
+            y += random.randint(10, 30)
+        pygame.draw.lines(screen, (255, 255, 200), False, points, 2)
+
 # --------- Inicialização do ambiente SimPy ---------
 env = simpy.Environment()
 
@@ -154,6 +165,9 @@ while running:
     # Preencher fundo
     bg_color = constantes.STORM_BG_COLOR if getattr(env, 'is_storm', False) else constantes.NORMAL_BG_COLOR
     screen.fill(bg_color)
+    
+    if getattr(env, 'is_storm', False):
+        draw_lightning(screen)
 
     # Desenhar recursos ainda não coletados
     for res in all_resources:

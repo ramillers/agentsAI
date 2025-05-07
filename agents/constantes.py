@@ -11,12 +11,19 @@ cell_size = CELL_SIZE
 BASE_POS = (GRID_WIDTH // 2, GRID_HEIGHT // 2)
 
 # Cores (RGB)
-BG_COLOR = (30, 30, 30)           # fundo escuro
+STORM_BG_COLOR = (70, 70, 100)    # Cor de fundo durante tempestade (azul escuro/acinzentado)
+NORMAL_BG_COLOR = (0, 0, 0)       # fundo escuro
 BASE_COLOR = (200, 200, 200)      # base clara
 CRYSTAL_COLOR = (0, 255, 255)     # cristal (ciano)
 METAL_COLOR = (255, 215, 0)       # metal (dourado)
 STRUCTURE_COLOR = (255, 0, 255)   # estrutura (magenta)
 OBSTACLE_COLOR = (100, 100, 100)  # obstáculos
+
+BDI_COLOR = (88, 72, 148)
+COOPERATIVE_COLOR = (51, 30, 247)
+GOALBASED_COLOR = (69, 89, 58)
+REACTIVE_COLOR = (133, 252, 82)
+STATEBASED_COLOR = (254, 51, 29)
 
 # Quantidade de recursos
 NUM_CRYSTALS = 10
@@ -37,3 +44,10 @@ REQUIRED_AGENTS = {
     'metal': 1,
     'estrutura': 2
 }
+
+# Valores da legenda
+LEGEND_WIDTH = 200  # Largura da área da legenda
+LEGEND_BG_COLOR = (240, 240, 240)  # Cor de fundo da legenda
+LEGEND_TEXT_COLOR = (0, 0, 0)  # Cor do texto
+LEGEND_MARGIN = 10  # Margem interna
+LEGEND_LINE_HEIGHT = 30  # Espaço entre linhas

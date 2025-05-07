@@ -9,8 +9,9 @@ class BDIAgent:
     def __init__(self, env, x, y, base_x, base_y):
         self.env = env
         self.x, self.y = x, y
+        self.name = "BDI"
         self.base_x, self.base_y = base_x, base_y
-        self.color = constantes.BASE_COLOR
+        self.color = constantes.BDI_COLOR
         self.beliefs = {} # Informações acumuladas de todos
         self.desires = [] # Painel que pode ser consultado pelos outros
         self.in_storm = False

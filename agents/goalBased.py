@@ -4,8 +4,8 @@ import constantes
 
 class GoalBasedAgent:
     """
-    Seleciona de forma gulosa o recurso de maior valor/distância, planeja um caminho
-    (BFS) até ele e depois retorna à base, registrando no painel todas as detecções e coletas.
+    Agente baseado em objetivos. Recebe objetivos do BDI via shared_info
+    quando está na base, segue até o objetivo e coleta. Não pondera valor.
     """
     def __init__(self, env, x, y, grid, base_x, base_y, obstacles):
         self.env = env
@@ -16,10 +16,11 @@ class GoalBasedAgent:
         self.obstacles = obstacles
         self.color = constantes.GOALBASED_COLOR
         self.resources_collected = 0
-        self.shared_info = {}
+        self.shared_info = {} # Atualizado pelo BDI na base
         self.plan = []
         self.target = None
         self.in_storm = False
+        self.carrying = None
         self.process = env.process(self.run())
 
     def find_path(self, start, goal):
@@ -53,31 +54,31 @@ class GoalBasedAgent:
                 yield from self.return_to_base()
                 self.in_storm = False
             else:
-                # detecta todos os recursos não coletados
-                seen = [(res.x, res.y, res.type) for res in self.grid if not res.collected]
-                for x0, y0, t in seen:
-                    self.shared_info[(x0, y0)] = t
-                # decide meta
-                if hasattr(self, 'carrying') and self.carrying:
+                if self.carrying:
                     goal = (self.base_x, self.base_y)
                 else:
-                    vals = {'cristal': 10, 'metal': 20, 'estrutura': 50}
-                    seen.sort(key=lambda e: (-vals[e[2]], abs(e[0]-self.x) + abs(e[1]-self.y)))
-                    goal = (seen[0][0], seen[0][1]) if seen else None
-                # monta plano
+                    if (self.x, self.y) == (self.base_x, self.base_y) and self.shared_info:
+                        # Pega o primeiro objetivo disponível do BDI
+                        for pos, rtype in self.shared_info.items():
+                            self.target = pos
+                            break
+                        self.shared_info.clear()  # limpa após pegar o alvo
+                    goal = self.target
+
                 if goal and (goal != self.target or not self.plan):
                     self.plan = self.find_path((self.x, self.y), goal)
                     self.target = goal
-                # executa próxima ação
+
                 if goal and (self.x, self.y) == goal:
-                    if hasattr(self, 'carrying') and self.carrying:
+                    if self.carrying:
                         self.deliver()
                     else:
                         self.collect_here()
                 elif self.plan:
                     nx, ny = self.plan.pop(0)
                     self.x, self.y = nx, ny
-                yield self.env.timeout(1)
+
+            yield self.env.timeout(1)
 
     def collect_here(self):
         for res in self.grid:
@@ -111,3 +112,5 @@ class GoalBasedAgent:
             size - 4
         )
         pygame.draw.rect(screen, self.color, rect)
+
+    #Commit

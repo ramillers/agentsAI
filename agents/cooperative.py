@@ -1,15 +1,13 @@
-# agents/cooperative.py
-
 import pygame
-import random
 from collections import deque
 import constantes
 
 class CooperativeAgent:
     """
-    Agente utilitário que coopera para coletar recursos do tipo 'estrutura', registrando
-    posições no shared_info e usando utilidade para decidir onde atuar.
+    Fica na base. Só sai quando o BDI informar um alvo cooperativo (estrutura/diamante).
+    Vai com outro agente cooperar, baseado em utilidade (valor/distância).
     """
+
     def __init__(self, env, x, y, grid, base_x, base_y, obstacles):
         self.env = env
         self.x, self.y = x, y
@@ -21,64 +19,88 @@ class CooperativeAgent:
         self.shared_info = {}
         self.plan = []
         self.target = None
+        self.waiting = False
         self.in_storm = False
         self.process = env.process(self.run())
 
-    def utility(self, tx, ty, free_agents):
-        dist = abs(tx - self.x) + abs(ty - self.y)
-        return 50 / (dist + 1) * (1 if free_agents >= 1 else 0)
+    def utility(self, pos):
+        """Calcula utilidade com base em valor/distância."""
+        dist = abs(pos[0] - self.x) + abs(pos[1] - self.y)
+        val_map = {'estrutura': 50, 'diamante': 100}
+        tipo = self.shared_info.get(pos, 'estrutura')
+        valor = val_map.get(tipo, 0)
+        return valor / (dist + 1)
 
     def run(self):
         while True:
             if self.in_storm:
                 yield from self.return_to_base()
                 self.in_storm = False
-            else:
-                # Atualiza shared_info com estruturas disponíveis
-                E_positions = [(r.x, r.y) for r in self.grid
-                               if not r.collected and r.type == 'estrutura']
-                for pos in E_positions:
-                    self.shared_info[pos] = 'estrutura'
+                continue
 
-                # Conta agentes livres
-                free_agents = sum(1 for a in self.env.agents
-                                  if a.id != getattr(self, 'id', None) and getattr(a, 'carrying', None) is None)
+            # Sempre começa na base
+            if (self.x, self.y) == (self.base_x, self.base_y):
+                # Se ainda não tem alvo, busca alvos cooperativos no shared_info
+                if not self.target:
+                    coop_targets = [
+                        pos for pos, tipo in self.shared_info.items()
+                        if tipo in ['estrutura', 'diamante']
+                    ]
+                    if coop_targets:
+                        scored = [(pos, self.utility(pos)) for pos in coop_targets]
+                        scored.sort(key=lambda x: -x[1])
+                        self.target = scored[0][0]
+                        self.plan = self.find_path((self.x, self.y), self.target)
+                        self.waiting = True
+                        print(f"[COOP] Aguardando parceiro para {self.target}")
 
-                # Seleciona alvo por utilidade
-                target = None
-                if free_agents and E_positions:
-                    utilities = [(pos, self.utility(pos[0], pos[1], free_agents)) for pos in E_positions]
-                    target, _ = max(utilities, key=lambda item: item[1])
+                # Se estiver esperando e parceiro chegou com mesmo alvo, prossegue
+                if self.waiting and self.has_partner():
+                    print(f"[COOP] Indo com parceiro para {self.target}")
+                    self.waiting = False
 
-                # Planeja caminho se necessário
-                if target and (target != self.target or not self.plan):
-                    self.plan = self.find_path((self.x, self.y), target)
-                    self.target = target
+            # Se já tem plano e não está esperando, segue
+            if self.plan and not self.waiting:
+                nx, ny = self.plan.pop(0)
+                self.x, self.y = nx, ny
 
-                # Executa ação
-                if target and (self.x, self.y) == target and free_agents >= 1:
-                    # Coleta cooperativa
+                # Ao chegar no destino, tenta coletar
+                if (self.x, self.y) == self.target:
                     for res in self.grid:
-                        if not res.collected and (res.x, res.y) == target:
+                        if not res.collected and (res.x, res.y) == self.target:
                             res.collected = True
                             self.resources_collected += res.value
-                            self.shared_info[target] = res.type
+                            print(f"[COOP] Recurso {res.type} coletado em {self.target}")
                             break
-                elif self.plan:
-                    nx, ny = self.plan.pop(0)
-                    self.x, self.y = nx, ny
-                else:
-                    # Movimento aleatório
-                    dx, dy = random.choice([(1,0),(-1,0),(0,1),(0,-1)])
-                    self.x = max(0, min(self.x + dx, constantes.GRID_WIDTH - 1))
-                    self.y = max(0, min(self.y + dy, constantes.GRID_HEIGHT - 1))
+                    # Limpa dados
+                    self.target = None
+                    self.plan = []
+                    self.waiting = False
 
-                yield self.env.timeout(1)
+            # Se o recurso foi pego por outro antes, limpa o alvo
+            if self.target:
+                found = any(not res.collected and (res.x, res.y) == self.target for res in self.grid)
+                if not found:
+                    print(f"[COOP] Recurso em {self.target} indisponível. Resetando.")
+                    self.target = None
+                    self.plan = []
+                    self.waiting = False
+
+            yield self.env.timeout(1)
+
+    def has_partner(self):
+        """Verifica se outro agente cooperativo está na base com o mesmo alvo."""
+        for ag in self.env.agents:
+            if ag is not self and isinstance(ag, CooperativeAgent):
+                if (ag.x, ag.y) == (self.base_x, self.base_y) and ag.target == self.target:
+                    return True
+        return False
 
     def find_path(self, start, goal):
+        """Busca caminho usando BFS."""
         queue = deque([start])
         visited = {start: None}
-        dirs = [(1,0),(-1,0),(0,1),(0,-1)]
+        dirs = [(1,0), (-1,0), (0,1), (0,-1)]
         while queue:
             cx, cy = queue.popleft()
             if (cx, cy) == goal:
@@ -99,16 +121,18 @@ class CooperativeAgent:
         return path
 
     def return_to_base(self):
+        """Retorna à base durante tempestade."""
         while (self.x, self.y) != (self.base_x, self.base_y):
-            dx = self.base_x - self.x; dy = self.base_y - self.y
+            dx = self.base_x - self.x
+            dy = self.base_y - self.y
             self.x += 1 if dx > 0 else -1 if dx < 0 else 0
             self.y += 1 if dy > 0 else -1 if dy < 0 else 0
             yield self.env.timeout(1)
 
     def draw(self, screen):
-        """
-        Desenha o agente como um círculo na tela do pygame.
-        """
+        """Desenha o agente como círculo."""
         size = constantes.CELL_SIZE
         center = (self.x * size + size // 2, self.y * size + size // 2)
         pygame.draw.circle(screen, self.color, center, size // 2 - 2)
+
+#Commit

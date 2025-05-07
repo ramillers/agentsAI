@@ -106,6 +106,5 @@ class GoalBasedAgent:
         size = constantes.CELL_SIZE
         center = (self.x * size + size // 2, self.y * size + size // 2)
         pygame.draw.circle(screen, self.color, center, size // 2 - 2)
-    
-    def Hello():
-        pass
+
+    #Commit

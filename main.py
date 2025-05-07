@@ -13,8 +13,8 @@ from agents.cooperative import CooperativeAgent
 from agents.bdi import BDIAgent
 
 # --------- Configurações iniciais ---------
-FPS = 10
-STORM_INTERVAL = 50  # passos até próxima tempestade
+FPS = 60
+STORM_INTERVAL = 100  # passos até próxima tempestade
 STORM_DURATION = 10  # duração da tempestade em passos
 env = simpy.Environment()
 env.is_storm = False  # Estado inicial sem tempestade
@@ -65,7 +65,10 @@ agents = []
 
 agent_classes = [ReactiveAgent, StateBasedAgent, GoalBasedAgent, CooperativeAgent, BDIAgent]
 for idx, cls in enumerate(agent_classes, start=1):
-    ag = cls(env, base_x, base_y, all_resources, base_x, base_y, obstacles)
+    if cls == BDIAgent:
+        ag = cls(env, base_x, base_y, base_x, base_y, all_resources)  # Parâmetros específicos para BDI
+    else:
+        ag = cls(env, base_x, base_y, all_resources, base_x, base_y, obstacles)
     ag.id = idx
     agents.append(ag)
     print(f"Agente {idx}: {cls.__name__} criado na base ({base_x},{base_y})")

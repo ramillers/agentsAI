@@ -9,6 +9,7 @@ class ReactiveAgent:
     def __init__(self, env, x, y, grid, base_x, base_y, obstacles):
         self.env = env
         self.x, self.y = x, y
+        self.name = "Reativo"
         self.grid = grid                # lista de Resource
         self.base_x, self.base_y = base_x, base_y
         self.obstacles = obstacles

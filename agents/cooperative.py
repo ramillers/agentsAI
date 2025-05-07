@@ -13,6 +13,7 @@ class CooperativeAgent:
     def __init__(self, env, x, y, grid, base_x, base_y, obstacles):
         self.env = env
         self.x, self.y = x, y
+        self.name = "Cooperativo"
         self.grid = grid
         self.base_x, self.base_y = base_x, base_y
         self.obstacles = obstacles

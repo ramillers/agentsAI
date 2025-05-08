@@ -97,7 +97,7 @@ class GoalBasedAgent:
     def collect_here(self):
         """Tenta coletar o recurso na posição atual"""
         for res in self.grid:
-            if not res.collected and (res.x, res.y) == (self.x, self.y):
+            if not res.collected and (res.x, res.y) == (self.x, self.y) and res.type != "estrutura":
                 res.collected = True
                 self.carrying = res.type
                 self.resources_collected += res.value

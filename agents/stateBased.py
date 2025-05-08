@@ -51,7 +51,7 @@ class StateBasedAgent:
 
     def collect_here(self):
         for res in self.grid:
-            if not res.collected and (res.x, res.y) == (self.x, self.y) and self.carrying is None:
+            if not res.collected and (res.x, res.y) == (self.x, self.y) and self.carrying is None and res.type != "estrutura":
                 res.collected = True
                 self.resources_collected += res.value
                 self.shared_info[(self.x, self.y)] = res.type

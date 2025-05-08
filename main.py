@@ -194,8 +194,12 @@ while time_atual - time_inicio < limite and running:
 
     # Desenhar e atualizar agentes
     for ag in agents:
-        ag.draw(screen)
-    
+        if ag.name != "BDI":
+            ag.draw(screen)
+        if hasattr(ag, "shared_info"):
+            #print(f"Agente: {ag.name} Tem {ag.shared_info} Recursos\n")
+            pass
+
 
     # Desenhar legenda
     draw_legend(screen, agents)
@@ -207,8 +211,9 @@ while time_atual - time_inicio < limite and running:
 print("\n=== Métricas de Coleta ===")
 for ag in agents:
     if ag.name != "BDI":
-        delivered = register_delivery(ag.name)
-        print(f"Agente {ag.name}: Conseguiu {delivered} Pontos")
+        delivered_dict = register_delivery(ag.name)
+        print(f"Agente {ag.name}: Conseguiu {delivered_dict["val"]} Pontos. Coletou {delivered_dict["resources"]}")
+
 
 pygame.quit()
 sys.exit()

@@ -26,13 +26,13 @@ REACTIVE_COLOR = (133, 252, 82)
 STATEBASED_COLOR = (254, 51, 29)
 
 # Quantidade de recursos
-NUM_CRYSTALS = 10
-NUM_METAL = 10
-NUM_STRUCTURES = 5
+NUM_CRYSTALS = 25
+NUM_METAL = 25
+NUM_STRUCTURES = 15
 # Tamanho da base (em células, deve ser ímpar para centralizar)
 BASE_SIZE = 3
 
-TEMPO_EXPERIMENTO = 120
+TEMPO_EXPERIMENTO = 60 #Em segundos
 
 # Valores e agentes necessários por tipo
 RESOURCE_VALUES = {

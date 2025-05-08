@@ -14,6 +14,7 @@ class StateBasedAgent:
         self.x, self.y = x, y
         self.name = "Baseado em Estado"
         self.grid = grid
+        self.coperating = False
         self.base_x, self.base_y = base_x, base_y
         self.obstacles = obstacles
         self.color = constantes.STATEBASED_COLOR
@@ -99,7 +100,7 @@ class StateBasedAgent:
             elif self.carrying:
                 if (self.x, self.y) == (self.base_x, self.base_y):
                     from utils.resource_manager import register_delivery
-                    register_delivery(self.name, constantes.RESOURCE_VALUES[self.carrying])
+                    register_delivery(self.name, self.carrying)
                     self.carrying = None
                     self.target = None
                     self.plan = []

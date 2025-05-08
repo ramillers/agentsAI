@@ -13,6 +13,7 @@ class GoalBasedAgent:
         self.x, self.y = x, y
         self.name = "Baseado em Objetivo"
         self.grid = grid
+        self.coperating = False
         self.base_x, self.base_y = base_x, base_y
         self.obstacles = obstacles
         self.color = constantes.GOALBASED_COLOR
@@ -59,18 +60,29 @@ class GoalBasedAgent:
                 self.in_storm = False
             else:
                 if self.carrying:
-                    goal = (self.base_x, self.base_y)
+                    goal = (self.base_x, self.base_y) #Aqui muda o objetivo para a base
+                elif self.coperating:
+                    #Aqui o plan já é atualizado para o mesmo do cooperativo
+                    if self.plan:
+                        nx, ny = self.plan.pop(0)
+                        self.x, self.y = nx, ny
+                    else:
+                        self.carrying = "estrutura"
+                        self.coperating = False
+                        register_delivery(self.name, self.carrying)
+
                 else:
                     if (self.x, self.y) == (self.base_x, self.base_y):
                         # Filtra targets válidos (disponíveis e não falhados anteriormente)
                         valid_targets = {
                             pos: rtype for pos, rtype in self.shared_info.items()
-                            if pos not in self.failed_targets and self.is_resource_available(pos)
+                            if pos not in self.failed_targets and self.is_resource_available(pos) and rtype != "estrutura"
                         }
                         
                         if valid_targets:
                             self.target = next(iter(valid_targets.keys()))
                             self.shared_info.clear()
+                            "possicao_do_recurso: tipo_do_recurso"
                         else:
                             self.target = None
                     
@@ -78,7 +90,7 @@ class GoalBasedAgent:
 
                 if goal:
                     if (self.x, self.y) == goal:
-                        if self.carrying:
+                        if self.carrying and self.carrying != "estrutura":
                             self.deliver()
                         else:
                             self.collect_here()
@@ -91,7 +103,7 @@ class GoalBasedAgent:
                     if self.plan:
                         nx, ny = self.plan.pop(0)
                         self.x, self.y = nx, ny
-                
+                    
                 yield self.env.timeout(1)
 
     def collect_here(self):
@@ -99,9 +111,9 @@ class GoalBasedAgent:
         for res in self.grid:
             if not res.collected and (res.x, res.y) == (self.x, self.y) and res.type != "estrutura":
                 res.collected = True
-                self.carrying = res.type
+                self.carrying = res.type #É o tipo do recurso
                 self.resources_collected += res.value
-                register_delivery(self.name, constantes.RESOURCE_VALUES[self.carrying])
+                register_delivery(self.name, self.carrying)
                 
                 # Remove de failed_targets se estava lá
                 self.failed_targets.discard((self.x, self.y))
@@ -122,7 +134,7 @@ class GoalBasedAgent:
     def deliver(self):
         """Entrega o recurso na base"""
         from utils.resource_manager import register_delivery
-        register_delivery(self.id, 1)
+        register_delivery(self.name, self.carrying)
         self.carrying = None
 
     def draw(self, screen):

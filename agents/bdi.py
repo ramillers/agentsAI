@@ -54,7 +54,6 @@ class BDIAgent:
             if ag is not self and hasattr(ag, 'shared_info'):
                 if (ag.x, ag.y) == (self.base_x, self.base_y):
                     ag.shared_info.update(self.beliefs)
-   
 
     def run(self):
         while True:

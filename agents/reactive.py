@@ -32,7 +32,7 @@ class ReactiveAgent:
             if not res.collected and res.type=='cristal' and res.x==self.x and res.y==self.y:
                 res.collected = True
                 self.resources_collected += res.value
-                register_delivery(self.name, constantes.RESOURCE_VALUES[res.type])
+                register_delivery(self.name, res.type)
                 # registra coleta no painel
                 self.shared_info[(self.x, self.y)] = res.type
                 break

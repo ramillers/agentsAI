@@ -1,6 +1,7 @@
 import pygame
 from collections import deque
 import constantes
+from utils.resource_manager import register_delivery
 
 class CooperativeAgent:
     """
@@ -11,7 +12,7 @@ class CooperativeAgent:
     def __init__(self, env, x, y, grid, base_x, base_y, obstacles):
         self.env = env
         self.x, self.y = x, y
-        self.name = "Cooperativo"
+        self.name = "Agente Cooperativo"
         self.grid = grid
         self.base_x, self.base_y = base_x, base_y
         self.obstacles = obstacles
@@ -71,6 +72,7 @@ class CooperativeAgent:
                         if not res.collected and (res.x, res.y) == self.target:
                             res.collected = True
                             self.resources_collected += res.value
+                            register_delivery(self.name, constantes.RESOURCE_VALUES[res.type])
                             print(f"[COOP] Recurso {res.type} coletado em {self.target}")
                             break
                     # Limpa dados

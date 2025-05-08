@@ -1,6 +1,7 @@
 import pygame
 from collections import deque
 import constantes
+from utils.resource_manager import register_delivery
 
 class GoalBasedAgent:
     """
@@ -100,6 +101,8 @@ class GoalBasedAgent:
                 res.collected = True
                 self.carrying = res.type
                 self.resources_collected += res.value
+                register_delivery(self.name, constantes.RESOURCE_VALUES[self.carrying])
+                
                 # Remove de failed_targets se estava lá
                 self.failed_targets.discard((self.x, self.y))
                 return True

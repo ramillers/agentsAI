@@ -201,8 +201,9 @@ while running:
 # Ao fechar, exibir métricas finais
 print("\n=== Métricas de Coleta ===")
 for ag in agents:
-    delivered = register_delivery(ag.id, None, query_only=True)
-    print(f"Agente {ag.id} ({type(ag).__name__}): entregou {delivered} unidades")
+    if ag.name != "BDI":
+        delivered = register_delivery(ag.name)
+        print(f"Agente {ag.name}: Conseguiu {delivered} Pontos")
 
 pygame.quit()
 sys.exit()

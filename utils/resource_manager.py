@@ -4,23 +4,19 @@
 
 _deliveries = {}
 
-def register_delivery(agent_id, resource=None, query_only=False):
-    """
-    Registra uma entrega de recurso pelo agente.
-    Se query_only=True, retorna a soma total entregue por esse agente.
-    """
-    if query_only:
-        return _deliveries.get(agent_id, 0)
+def register_delivery(agent_id, val=None):
 
     # Determina valor do recurso
-    val = 0
-    if hasattr(resource, 'value'):
-        val = resource.value
-    elif isinstance(resource, (int, float)):
-        val = resource
+    if val != None:
+        if agent_id not in _deliveries:
+            _deliveries[agent_id] = val
 
-    # Atualiza o registro
-    _deliveries.setdefault(agent_id, 0)
-    _deliveries[agent_id] += val
-    print(f"[DELIVERY] Agente {agent_id} entregou valor {val}. Total = {_deliveries[agent_id]}")
-    return _deliveries[agent_id]
+        else:
+            _deliveries[agent_id] += val
+
+        print(f"[DELIVERY] Agente {agent_id} entregou valor {val}. Total = {_deliveries[agent_id]}")
+    
+    elif agent_id in _deliveries:
+        return _deliveries[agent_id]
+    else:
+        return 0

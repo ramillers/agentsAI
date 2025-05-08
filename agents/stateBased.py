@@ -12,7 +12,7 @@ class StateBasedAgent:
     def __init__(self, env, x, y, grid, base_x, base_y, obstacles):
         self.env = env
         self.x, self.y = x, y
-        self.name = "Baseado em estado"
+        self.name = "Baseado em Estado"
         self.grid = grid
         self.base_x, self.base_y = base_x, base_y
         self.obstacles = obstacles
@@ -99,7 +99,7 @@ class StateBasedAgent:
             elif self.carrying:
                 if (self.x, self.y) == (self.base_x, self.base_y):
                     from utils.resource_manager import register_delivery
-                    register_delivery(self.id, 1)
+                    register_delivery(self.name, constantes.RESOURCE_VALUES[self.carrying])
                     self.carrying = None
                     self.target = None
                     self.plan = []

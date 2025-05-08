@@ -2,6 +2,7 @@ import sys
 import random
 import pygame
 import simpy
+import time
 
 import constantes
 import recursos
@@ -156,7 +157,11 @@ clock = pygame.time.Clock()
 
 # --------- Loop principal ---------
 running = True
-while running:
+time_inicio = time.time()
+time_atual = time_inicio
+limite = constantes.TEMPO_EXPERIMENTO
+while time_atual - time_inicio < limite and running:
+    time_atual = time.time()
     # Processamento do SimPy (um passo)
     env.step()
 

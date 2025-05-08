@@ -32,6 +32,7 @@ NUM_STRUCTURES = 5
 # Tamanho da base (em células, deve ser ímpar para centralizar)
 BASE_SIZE = 3
 
+TEMPO_EXPERIMENTO = 120
 
 # Valores e agentes necessários por tipo
 RESOURCE_VALUES = {

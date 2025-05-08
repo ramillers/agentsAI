@@ -212,7 +212,11 @@ print("\n=== Métricas de Coleta ===")
 for ag in agents:
     if ag.name != "BDI":
         delivered_dict = register_delivery(ag.name)
-        print(f"Agente {ag.name}: Conseguiu {delivered_dict["val"]} Pontos. Coletou {delivered_dict["resources"]}")
+        if delivered_dict != 0:
+            print(f"Agente {ag.name}: Conseguiu {delivered_dict["val"]} Pontos. Coletou {delivered_dict["resources"]}")
+        else:
+            print(f"Agente {ag.name}: Conseguiu {0} Pontos. Coletou ()")
+
 
 
 pygame.quit()
